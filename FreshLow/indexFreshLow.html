@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fresh Flow - Arcade & Gestión</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0d0518;
+            --accent-yellow: #ffcc00;
+            --accent-pink: #ff2fb0;
+            --accent-cyan: #00f0ff;
+            --accent-green: #39ff6e;
+            --accent-red: #ff3860;
+            --panel-bg: rgba(30, 20, 50, 0.9);
+            --btn-green: #2ecc71;
+            --btn-red: #e74c3c;
+            --bar-wood: #8b5a2b;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at 50% 20%, #2a1550 0%, #0d0518 70%);
+            color: #fff;
+            font-family: 'VT323', monospace;
+            font-size: 1.15em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .arcade-title {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.3em;
+            color: var(--accent-yellow);
+            text-shadow: 0 0 6px var(--accent-yellow), 0 0 18px var(--accent-pink), 3px 3px 0 #000;
+            margin-bottom: 14px;
+            letter-spacing: 2px;
+            animation: titleFlicker 3.2s infinite;
+        }
+
+        @keyframes titleFlicker {
+            0%, 92%, 96%, 100% { opacity: 1; }
+            93% { opacity: 0.55; }
+            95% { opacity: 0.85; }
+        }
+
+        #game-container {
+            width: 850px;
+            height: 650px;
+            background-color: #1b1030;
+            border: 6px solid var(--accent-yellow);
+            border-radius: 14px;
+            box-shadow:
+                0 0 0 4px #000,
+                0 0 0 10px #3a1f66,
+                0 0 25px 6px rgba(255, 47, 176, 0.45),
+                0 15px 35px rgba(0,0,0,0.8);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Efecto CRT / scanlines para look arcade */
+        #game-container::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 500;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(0,0,0,0) 0px,
+                rgba(0,0,0,0) 2px,
+                rgba(0,0,0,0.12) 3px,
+                rgba(0,0,0,0) 4px
+            );
+            mix-blend-mode: overlay;
+        }
+
+        @keyframes shakeScreen {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+
+        #game-container.shake { animation: shakeScreen 0.35s ease; }
+
+        header {
+            background: linear-gradient(180deg, #fff066, var(--accent-yellow));
+            color: #1a0f2e;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            z-index: 10;
+            border-bottom: 3px solid #000;
+        }
+
+        header .arcade-title { margin: 0; font-size: 0.85em; text-shadow: 2px 2px 0 #fff, 3px 3px 0 #000; color: #1a0f2e; -webkit-text-stroke: 0; }
+
+        .stats-bar {
+            display: flex;
+            gap: 14px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.55em;
+        }
+
+        .stat-item {
+            background: #150c24;
+            color: var(--accent-cyan);
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 2px solid #000;
+            text-shadow: 0 0 5px var(--accent-cyan);
+        }
+
+        .stat-item span { color: var(--accent-yellow); text-shadow: 0 0 5px var(--accent-yellow); }
+
+        #combo-indicator {
+            position: absolute;
+            top: 52px;
+            right: 14px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6em;
+            color: var(--accent-green);
+            text-shadow: 0 0 8px var(--accent-green);
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            pointer-events: none;
+        }
+
+        #combo-indicator.show { opacity: 1; transform: scale(1.08); }
+
+        /* ESCENARIO DEL BAR (FONDO VISUAL) */
+        #bar-scene {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(to bottom, #4a2b82 0%, #2a1845 70%, #150c24 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        /* Elementos Decorativos Desbloqueables en el Fondo */
+        .decor-item {
+            position: absolute;
+            transition: all 0.5s ease;
+        }
+
+        #decor-poster { top: 15px; left: 20px; font-size: 2em; display: none; filter: drop-shadow(0 0 6px var(--accent-pink)); }
+        #decor-lights { top: 0; width: 100%; text-align: center; font-size: 1.5em; display: none; letter-spacing: 15px; animation: twinkle 1.4s infinite alternate; }
+        #decor-neon { top: 20px; right: 20px; font-size: 1.8em; display: none; text-shadow: 0 0 10px var(--accent-cyan), 0 0 20px var(--accent-pink); animation: neonPulse 1.8s infinite; }
+
+        @keyframes twinkle { 0% { opacity: 0.6; } 100% { opacity: 1; } }
+        @keyframes neonPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
+
+        /* Toasts de notificación (estilo arcade) */
+        #toast-container {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: center;
+            pointer-events: none;
+            width: 90%;
+        }
+
+        .toast {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.55em;
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: 2px solid #000;
+            color: #000;
+            text-align: center;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.5);
+            animation: toastIn 0.25s ease, toastOut 0.4s ease 2.1s forwards;
+            max-width: 90%;
+        }
+
+        .toast.success { background: var(--accent-green); }
+        .toast.error { background: var(--accent-red); color: #fff; }
+        .toast.info { background: var(--accent-cyan); }
+        .toast.warning { background: var(--accent-yellow); }
+
+        @keyframes toastIn {
+            0% { opacity: 0; transform: translateY(-15px) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toastOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-10px) scale(0.9); }
+        }
+
+        /* Texto flotante de dinero ganado */
+        .floating-money {
+            position: absolute;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: var(--accent-green);
+            text-shadow: 2px 2px 0 #000;
+            z-index: 250;
+            pointer-events: none;
+            animation: floatUp 1.1s ease forwards;
+        }
+
+        .floating-money.penalty { color: var(--accent-red); }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(0.8); }
+            20% { transform: translateY(-10px) scale(1.15); }
+            100% { opacity: 0; transform: translateY(-70px) scale(1); }
+        }
+
+        /* Área de Clientes */
+        #customers-area {
+            height: 180px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding: 0 50px;
+            z-index: 2;
+        }
+
+        .customer-avatar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            animation: popIn 0.35s cubic-bezier(.5,1.8,.6,1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .speech-bubble {
+            background: #fff;
+            color: #000;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: bold;
+            border: 2px solid #000;
+            margin-bottom: 5px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .speech-bubble::after {
+            content: "";
+            position: absolute;
+            bottom: -9px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 8px 6px 0 6px;
+            border-style: solid;
+            border-color: #000 transparent transparent transparent;
+        }
+
+        .customer-sprite {
+            font-size: 3.5em;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.5));
+            transition: transform 0.2s ease;
+        }
+
+        .customer-sprite.bounce { animation: custBounce 0.5s ease infinite; }
+
+        @keyframes custBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .patience-bar-bg {
+            width: 55px;
+            height: 7px;
+            background: #222;
+            border: 1px solid #000;
+            border-radius: 3px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .patience-bar-fill {
+            height: 100%;
+            background: var(--btn-green);
+            width: 100%;
+            transition: width 1s linear, background-color 0.3s ease;
+        }
+
+        /* Barra de Trabajo (Mostrador) */
+        #counter-bar {
+            height: 140px;
+            background: linear-gradient(to bottom, #8b5a2b, #5c3a1c);
+            border-top: 6px solid #a66c35;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 3;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+        }
+
+        .prep-station {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .ingredients-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .btn-ingredient {
+            background: linear-gradient(180deg, #ffffff, #dcdcdc);
+            border: 2px solid #000;
+            border-bottom: 4px solid #555;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-family: 'VT323', monospace;
+            font-size: 1.05em;
+            font-weight: bold;
+            transition: transform 0.08s ease;
+        }
+
+        .btn-ingredient:active { transform: translateY(2px); border-bottom-width: 2px; }
+
+        /* Licuadora Visual */
+        .blender-station {
+            background: #111;
+            border: 3px solid var(--accent-pink);
+            border-radius: 8px;
+            padding: 8px;
+            width: 180px;
+            text-align: center;
+            box-shadow: 0 0 12px rgba(255,47,176,0.4);
+        }
+
+        #blender-sprite { font-size: 2em; display: inline-block; }
+        #blender-sprite.bounce { animation: blenderBounce 0.35s ease; }
+        #blender-sprite.full { animation: blenderShake 0.4s ease infinite; }
+
+        @keyframes blenderBounce {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.35) rotate(-6deg); }
+            100% { transform: scale(1); }
+        }
+        @keyframes blenderShake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-4deg); }
+            75% { transform: rotate(4deg); }
+        }
+
+        /* CONTROLES E INVENTARIO INFERIOR */
+        #control-panel {
+            height: 110px;
+            background: #150c24;
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 4;
+        }
+
+        .progress-container {
+            width: 100%;
+            background: #333;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #555;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff66b2, #ffcc00);
+            width: 0%;
+            transition: width 0.3s;
+            box-shadow: 0 0 8px var(--accent-yellow);
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-action {
+            background: var(--btn-green);
+            color: #fff;
+            border: 2px solid #000;
+            border-bottom: 4px solid #1c7a43;
+            padding: 8px 15px;
+            font-weight: bold;
+            font-family: 'VT323', monospace;
+            font-size: 1.05em;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.08s ease;
+        }
+
+        .btn-action:active { transform: translateY(2px); border-bottom-width: 2px; }
+
+        .btn-action.clear { background: var(--btn-red); border-bottom-color: #8e2116; }
+
+        .log-box {
+            font-size: 1.05em;
+            color: var(--accent-cyan);
+            max-width: 450px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 0 0 4px rgba(0,240,255,0.5);
+        }
+
+        /* OVERLAYS (TIENDA Y FIN DE JUEGO) */
+        .overlay-panel {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 6, 20, 0.96);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .hidden { display: none !important; }
+
+        .overlay-panel h2 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9em;
+            color: var(--accent-yellow);
+            text-shadow: 0 0 8px var(--accent-yellow);
+            text-align: center;
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 360px;
+            overflow-y: auto;
+            margin: 15px 0;
+            padding-right: 5px;
+        }
+
+        .shop-item {
+            background: #fff;
+            color: #000;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s ease;
+        }
+
+        .shop-item:not(.purchased):hover { transform: translateY(-2px); }
+
+        .shop-item.purchased { background: #e8ffe9; }
+
+        .shop-item button {
+            background: var(--btn-green);
+            color: #fff;
+            border: 1px solid #000;
+            border-bottom: 3px solid #1c7a43;
+            padding: 5px;
+            font-weight: bold;
+            font-family: 'VT323', monospace;
+            font-size: 1.05em;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .shop-item button:disabled { background: #888; border-bottom-color: #555; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="arcade-title">🍹 FRESH FLOW ARCADE 🍹</div>
+
+<div id="game-container">
+    <div id="toast-container"></div>
+    <div id="combo-indicator"></div>
+
+    <header>
+        <div class="arcade-title">FRESH FLOW</div>
+        <div class="stats-bar">
+            <div class="stat-item">DÍA <span id="ui-day">1</span></div>
+            <div class="stat-item"><span id="ui-time">07:00 AM</span></div>
+            <div class="stat-item">$<span id="ui-money">100</span></div>
+        </div>
+    </header>
+
+    <!-- ESCENARIO DEL BAR -->
+    <div id="bar-scene">
+        <div id="decor-lights">💡✨💡✨💡✨💡</div>
+        <div id="decor-poster">🖼️</div>
+        <div id="decor-neon">🍸 NEON BAR 🍸</div>
+
+        <!-- Clientes en Pantalla -->
+        <div id="customers-area"></div>
+
+        <!-- Mostrador de Trabajo -->
+        <div id="counter-bar">
+            <div class="prep-station">
+                <div class="ingredients-grid" id="ingredients-container"></div>
+            </div>
+
+            <div class="blender-station">
+                <div id="blender-sprite">🥤</div>
+                <div id="blender-display" style="font-size:0.9em; color:var(--accent-yellow); margin-top:2px;">Vacía</div>
+                <button class="btn-action clear" style="font-size:0.8em; padding:2px 6px; margin-top:4px;" onclick="clearBlender()">Vaciar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL INFERIOR -->
+    <div id="control-panel">
+        <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85em; margin-bottom:2px;">
+                <span>Progreso de Mejoras del Bar</span>
+                <span id="ui-progress-text">0%</span>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="ui-progress-bar"></div>
+            </div>
+        </div>
+
+        <div class="action-row">
+            <div class="log-box" id="game-log">¡Bienvenido! Atiende a los clientes antes de las 06:00 PM.</div>
+            <span style="font-size:0.9em; color:var(--accent-yellow);">Meta diaria: $150</span>
+        </div>
+    </div>
+
+    <!-- PANTALLA TIENDA (FINAL DEL DÍA) -->
+    <div id="shop-modal" class="overlay-panel hidden">
+        <h2>CIERRE DEL DÍA — TIENDA</h2>
+        <p id="shop-summary-text" style="margin: 5px 0; font-size:1em;"></p>
+        <p id="event-notice" style="color: var(--accent-pink); font-size: 0.95em; margin: 0; min-height: 18px;"></p>
+
+        <div class="shop-grid" id="shop-items-container"></div>
+
+        <button class="btn-action" style="width: 100%; max-width: 300px;" onclick="startNextDay()">Pagar Alquiler ($<span id="rent-cost-label"></span>) e Iniciar Día</button>
+    </div>
+
+    <!-- PANTALLA FINAL -->
+    <div id="end-modal" class="overlay-panel hidden">
+        <h1 id="end-title" style="margin:0; font-family:'Press Start 2P', cursive; font-size:1.3em; text-shadow:3px 3px 0 #000;"></h1>
+        <p id="end-message" style="text-align: center; max-width: 500px; margin: 15px 0; font-size:1.1em;"></p>
+        <button class="btn-action" onclick="resetGame()">Jugar de Nuevo</button>
+    </div>
+</div>
+
+<script>
+    // --- CATALOGO DE MEJORAS DE LA TIENDA ---
+    const SHOP_CATALOG = [
+        { id: 'item_poster', name: 'Cuadro Decorativo', desc: 'Mejora el aspecto visual del bar.', cost: 60, type: 'decor', sprite: 'poster' },
+        { id: 'item_lights', name: 'Luces Festivas', desc: 'Añade iluminación al techo del bar.', cost: 90, type: 'decor', sprite: 'lights' },
+        { id: 'item_neon', name: 'Letrero de Neón', desc: 'Atrae clientes con un letrero brillante.', cost: 140, type: 'decor', sprite: 'neon' },
+        { id: 'item_blender', name: 'Licuadora Pro', desc: 'Aumenta $10 al valor de cada bebida.', cost: 100, type: 'upgrade' },
+        { id: 'ing_menta', name: 'Menta Fresca', desc: 'Desbloquea recetas con Menta.', cost: 50, type: 'ingredient', ingName: 'Menta' },
+        { id: 'ing_limon', name: 'Limón Jugoso', desc: 'Desbloquea recetas con Limón.', cost: 50, type: 'ingredient', ingName: 'Limón' },
+        { id: 'ing_coco', name: 'Agua de Coco', desc: 'Desbloquea recetas con Coco.', cost: 70, type: 'ingredient', ingName: 'Coco' }
+    ];
+
+    // Precios de productos ajustados: cada receta vale más, con incrementos
+    // crecientes según su complejidad e ingredientes especiales requeridos.
+    const RECIPES = [
+        { name: 'Jugo Basico', ingredients: ['Mango', 'Agua'], price: 40, sprite: '🥤' },
+        { name: 'Mix Frutal', ingredients: ['Mango', 'Frutilla', 'Agua'], price: 62, sprite: '🍹' },
+        { name: 'Toque Menta', ingredients: ['Frutilla', 'Menta', 'Agua'], price: 88, requires: 'Menta', sprite: '🍸' },
+        { name: 'Limonada', ingredients: ['Limón', 'Agua'], price: 58, requires: 'Limón', sprite: '🍹' },
+        { name: 'Coco Tropical', ingredients: ['Mango', 'Coco'], price: 100, requires: 'Coco', sprite: '🥥' }
+    ];
+
+    const INGREDIENT_ICONS = {
+        'Mango': '🥭', 'Frutilla': '🍓', 'Agua': '💧',
+        'Menta': '🌿', 'Limón': '🍋', 'Coco': '🥥'
+    };
+
+    const CUSTOMER_AVATARS = ['🧔', '👩', '👨', '👧', '👵', '👴', '🕶️'];
+
+    // --- ESTADO DEL JUEGO ---
+    let gameState = {
+        day: 1,
+        hour: 7, // 7 AM a 18 PM (6 PM)
+        money: 100,
+        rentCost: 40,
+        unlockedIngredients: ['Mango', 'Frutilla', 'Agua'],
+        purchasedUpgrades: [],
+        blenderContents: [],
+        customers: [],
+        hourTimer: null,
+        customerSpawner: null,
+        patienceTicker: null,
+        hasFastBlender: false,
+        combo: 0
+    };
+
+    let audioCtx = null;
+
+    // --- SONIDO ARCADE (sin archivos externos, con Web Audio API) ---
+    function playTone(freq = 440, duration = 0.15, type = 'sine') {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.09, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain).connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch (e) { /* audio no disponible, se ignora */ }
+    }
+
+    function playServeJingle() {
+        playTone(660, 0.09, 'square');
+        setTimeout(() => playTone(990, 0.12, 'square'), 90);
+    }
+
+    // --- INICIALIZACIÓN ---
+    function initGame() {
+        renderIngredients();
+        updateUI();
+        document.getElementById('rent-cost-label').innerText = gameState.rentCost;
+        startDay();
+    }
+
+    function renderIngredients() {
+        const container = document.getElementById('ingredients-container');
+        container.innerHTML = '';
+        gameState.unlockedIngredients.forEach(ing => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-ingredient';
+            btn.innerText = `${INGREDIENT_ICONS[ing] || '🧪'} ${ing}`;
+            btn.onclick = () => addIngredient(ing);
+            container.appendChild(btn);
+        });
+    }
+
+    // --- CICLO DEL DÍA Y TIEMPO (7 seg por hora) ---
+    function startDay() {
+        gameState.hour = 7;
+        gameState.customers = [];
+        gameState.combo = 0;
+        renderCustomers();
+        updateComboIndicator();
+        updateUI();
+        log(`Día ${gameState.day} iniciado. El bar abre a las 07:00 AM.`);
+        playTone(500, 0.2, 'triangle');
+
+        // Temporizador de Horas (1 hora = 7.000 ms)
+        clearInterval(gameState.hourTimer);
+        gameState.hourTimer = setInterval(() => {
+            gameState.hour++;
+            updateUI();
+
+            if (gameState.hour >= 18) {
+                endWorkDay();
+            }
+        }, 7000);
+
+        // Generador de clientes aleatorio (escalado a la nueva duración de hora)
+        clearInterval(gameState.customerSpawner);
+        gameState.customerSpawner = setInterval(spawnCustomer, 2800);
+        spawnCustomer();
+
+        // Ticker de paciencia de los clientes (cada segundo real)
+        clearInterval(gameState.patienceTicker);
+        gameState.patienceTicker = setInterval(tickPatience, 1000);
+    }
+
+    function spawnCustomer() {
+        if (gameState.customers.length >= 3 || gameState.hour >= 17) return;
+
+        let availableRecipes = RECIPES.filter(r => !r.requires || gameState.unlockedIngredients.includes(r.requires));
+        let recipe = availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
+        let avatar = CUSTOMER_AVATARS[Math.floor(Math.random() * CUSTOMER_AVATARS.length)];
+
+        let customer = {
+            id: Date.now() + Math.floor(Math.random() * 1000),
+            avatar: avatar,
+            recipe: recipe,
+            maxPatience: 14,
+            patience: 14
+        };
+
+        gameState.customers.push(customer);
+        renderCustomers();
+    }
+
+    // Disminuye la paciencia de todos los clientes en pantalla; si alguno
+    // llega a cero, se va enojado y se rompe el combo actual.
+    function tickPatience() {
+        if (!gameState.customers.length) return;
+
+        let anyLeft = false;
+        gameState.customers.forEach(c => { c.patience -= 1; });
+
+        const angry = gameState.customers.filter(c => c.patience <= 0);
+        if (angry.length) {
+            gameState.customers = gameState.customers.filter(c => c.patience > 0);
+            gameState.combo = 0;
+            updateComboIndicator();
+            angry.forEach(c => {
+                showToast(`${c.avatar} se cansó de esperar y se fue`, 'error');
+                playTone(160, 0.25, 'sawtooth');
+            });
+            anyLeft = true;
+        }
+
+        if (anyLeft) {
+            renderCustomers();
+        } else {
+            updatePatienceBars();
+        }
+    }
+
+    function updatePatienceBars() {
+        gameState.customers.forEach(c => {
+            const fill = document.getElementById(`patience-${c.id}`);
+            if (!fill) return;
+            const pct = Math.max(0, Math.round((c.patience / c.maxPatience) * 100));
+            fill.style.width = `${pct}%`;
+            if (pct > 55) fill.style.background = 'var(--btn-green)';
+            else if (pct > 25) fill.style.background = 'var(--accent-yellow)';
+            else fill.style.background = 'var(--accent-red)';
+        });
+    }
+
+    function endWorkDay() {
+        clearInterval(gameState.hourTimer);
+        clearInterval(gameState.customerSpawner);
+        clearInterval(gameState.patienceTicker);
+
+        log("¡Son las 06:00 PM! El bar ha cerrado por hoy.");
+        playTone(300, 0.3, 'triangle');
+
+        // Eventos aleatorios nocturnos
+        let eventText = "";
+        if (Math.random() < 0.4) {
+            let penalty = Math.floor(Math.random() * 20) + 10;
+            gameState.money = Math.max(0, gameState.money - penalty);
+            eventText = `¡Evento inesperado! Reparación técnica nocturna: -$${penalty}.`;
+        }
+
+        document.getElementById('shop-summary-text').innerText =
+            `Jornada terminada. Saldo actual: $${gameState.money}.`;
+        document.getElementById('event-notice').innerText = eventText;
+        document.getElementById('rent-cost-label').innerText = gameState.rentCost;
+
+        openShop();
+    }
+
+    // --- ACCIONES EN LA BARRA ---
+    function addIngredient(ing) {
+        if (gameState.blenderContents.length >= 3) return;
+        gameState.blenderContents.push(ing);
+        updateBlenderDisplay();
+
+        const sprite = document.getElementById('blender-sprite');
+        sprite.classList.remove('bounce');
+        void sprite.offsetWidth; // reinicia la animación
+        sprite.classList.add('bounce');
+        playTone(420 + gameState.blenderContents.length * 60, 0.08, 'square');
+    }
+
+    function clearBlender() {
+        gameState.blenderContents = [];
+        updateBlenderDisplay();
+    }
+
+    function updateBlenderDisplay() {
+        const display = document.getElementById('blender-display');
+        const sprite = document.getElementById('blender-sprite');
+        if (gameState.blenderContents.length) {
+            display.innerText = gameState.blenderContents
+                .map(i => `${INGREDIENT_ICONS[i] || ''}${i}`)
+                .join(' + ');
+        } else {
+            display.innerText = 'Vacía';
+        }
+        sprite.classList.toggle('full', gameState.blenderContents.length >= 3);
+    }
+
+    function serveCustomer(customerId) {
+        let index = gameState.customers.findIndex(c => c.id === customerId);
+        if (index === -1) return;
+
+        let customer = gameState.customers[index];
+
+        if (arraysMatch(gameState.blenderContents, customer.recipe.ingredients)) {
+            let earnings = customer.recipe.price + (gameState.hasFastBlender ? 10 : 0);
+            gameState.combo++;
+
+            let comboBonus = 0;
+            if (gameState.combo > 0 && gameState.combo % 3 === 0) {
+                comboBonus = 15;
+                showToast(`¡COMBO x${gameState.combo}! Bono +$${comboBonus}`, 'warning');
+            }
+
+            gameState.money += earnings + comboBonus;
+            log(`Atendiste a cliente con ${customer.recipe.name}. Ganaste +$${earnings + comboBonus}.`);
+            showToast(`✅ ¡Pedido entregado! +$${earnings + comboBonus}`, 'success');
+            spawnFloatingMoney(`+$${earnings + comboBonus}`, false);
+            playServeJingle();
+
+            gameState.customers.splice(index, 1);
+            clearBlender();
+            renderCustomers();
+            updateComboIndicator();
+            updateUI();
+        } else {
+            log("La combinación en la licuadora no coincide con el pedido.");
+            showToast("❌ Esa combinación no es la que pidió", 'error');
+            gameState.combo = 0;
+            updateComboIndicator();
+            playTone(140, 0.2, 'square');
+            shakeScreen();
+        }
+    }
+
+    function arraysMatch(a, b) {
+        if (a.length !== b.length) return false;
+        let s1 = [...a].sort(), s2 = [...b].sort();
+        return s1.every((val, i) => val === s2[i]);
+    }
+
+    // --- TIENDA Y MEJORAS ---
+    function openShop() {
+        const container = document.getElementById('shop-items-container');
+        container.innerHTML = '';
+
+        SHOP_CATALOG.forEach(item => {
+            let purchased = gameState.purchasedUpgrades.includes(item.id);
+            let div = document.createElement('div');
+            div.className = 'shop-item' + (purchased ? ' purchased' : '');
+            div.innerHTML = `
+                <div>
+                    <strong>${item.name}</strong>
+                    <p style="font-size:0.85em; margin:2px 0;">${item.desc}</p>
+                </div>
+                <div style="margin-top:5px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>$${item.cost}</span>
+                    <button ${purchased || gameState.money < item.cost ? 'disabled' : ''} 
+                        onclick="buyItem('${item.id}')">${purchased ? '✔ Comprado' : 'Comprar'}</button>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+
+        document.getElementById('shop-modal').classList.remove('hidden');
+    }
+
+    function buyItem(itemId) {
+        let item = SHOP_CATALOG.find(i => i.id === itemId);
+        if (!item || gameState.money < item.cost) return;
+
+        gameState.money -= item.cost;
+        gameState.purchasedUpgrades.push(item.id);
+        playTone(700, 0.15, 'sine');
+        showToast(`🛒 Compraste: ${item.name}`, 'info');
+
+        if (item.type === 'ingredient') {
+            gameState.unlockedIngredients.push(item.ingName);
+            renderIngredients();
+        } else if (item.id === 'item_blender') {
+            gameState.hasFastBlender = true;
+        } else if (item.type === 'decor') {
+            document.getElementById(`decor-${item.sprite}`).style.display = 'block';
+        }
+
+        updateUI();
+        openShop(); // Actualizar lista de tienda
+
+        // Verificación de condición de victoria
+        if (gameState.purchasedUpgrades.length === SHOP_CATALOG.length) {
+            document.getElementById('shop-modal').classList.add('hidden');
+            showEndGame(true, "¡Has comprado absolutamente todas las mejoras! Tu bar de bebidas sin alcohol es el más exitoso de la ciudad.");
+        }
+    }
+
+    function startNextDay() {
+        gameState.money -= gameState.rentCost;
+
+        if (gameState.money < 0) {
+            document.getElementById('shop-modal').classList.add('hidden');
+            showEndGame(false, "No tuviste suficiente dinero para pagar el alquiler operativo. ¡Has caído en bancarrota!");
+            return;
+        }
+
+        gameState.day++;
+        document.getElementById('shop-modal').classList.add('hidden');
+        startDay();
+    }
+
+    // --- RENDERIZADO VISUAL ---
+    function updateUI() {
+        document.getElementById('ui-day').innerText = gameState.day;
+
+        let displayHour = gameState.hour > 12 ? gameState.hour - 12 : gameState.hour;
+        let ampm = gameState.hour >= 12 ? 'PM' : 'AM';
+        document.getElementById('ui-time').innerText = `${displayHour < 10 ? '0' : ''}${displayHour}:00 ${ampm}`;
+
+        document.getElementById('ui-money').innerText = `${gameState.money}`;
+
+        // Barra de Progreso
+        let progressPct = Math.round((gameState.purchasedUpgrades.length / SHOP_CATALOG.length) * 100);
+        document.getElementById('ui-progress-bar').style.width = `${progressPct}%`;
+        document.getElementById('ui-progress-text').innerText = `${progressPct}%`;
+    }
+
+    function renderCustomers() {
+        const area = document.getElementById('customers-area');
+        area.innerHTML = '';
+
+        gameState.customers.forEach(c => {
+            let div = document.createElement('div');
+            div.className = 'customer-avatar';
+            let pct = Math.max(0, Math.round((c.patience / c.maxPatience) * 100));
+            div.innerHTML = `
+                <div class="speech-bubble">
+                    ${c.recipe.sprite} ${c.recipe.name}<br>
+                    <small>(${c.recipe.ingredients.join('+')})</small>
+                </div>
+                <div class="customer-sprite ${pct <= 25 ? 'bounce' : ''}">${c.avatar}</div>
+                <div class="patience-bar-bg"><div class="patience-bar-fill" id="patience-${c.id}" style="width:${pct}%;"></div></div>
+                <button class="btn-action" style="font-size:0.8em; padding:3px 6px; margin-top:3px;" onclick="serveCustomer(${c.id})">Entregar</button>
+            `;
+            area.appendChild(div);
+        });
+    }
+
+    function updateComboIndicator() {
+        const el = document.getElementById('combo-indicator');
+        if (gameState.combo >= 2) {
+            el.innerText = `COMBO x${gameState.combo}`;
+            el.classList.add('show');
+        } else {
+            el.classList.remove('show');
+        }
+    }
+
+    // --- NOTIFICACIONES ESTILO ARCADE ---
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 2600);
+    }
+
+    function spawnFloatingMoney(text, isPenalty) {
+        const scene = document.getElementById('bar-scene');
+        const el = document.createElement('div');
+        el.className = 'floating-money' + (isPenalty ? ' penalty' : '');
+        el.innerText = text;
+        el.style.left = `${45 + Math.random() * 10}%`;
+        el.style.bottom = '150px';
+        scene.appendChild(el);
+        setTimeout(() => el.remove(), 1150);
+    }
+
+    function shakeScreen() {
+        const container = document.getElementById('game-container');
+        container.classList.remove('shake');
+        void container.offsetWidth;
+        container.classList.add('shake');
+        setTimeout(() => container.classList.remove('shake'), 400);
+    }
+
+    function showEndGame(victory, msg) {
+        clearInterval(gameState.hourTimer);
+        clearInterval(gameState.customerSpawner);
+        clearInterval(gameState.patienceTicker);
+        const modal = document.getElementById('end-modal');
+        document.getElementById('end-title').innerText = victory ? "¡VICTORIA TOTAL!" : "GAME OVER";
+        document.getElementById('end-title').style.color = victory ? "var(--btn-green)" : "var(--btn-red)";
+        document.getElementById('end-message').innerText = msg;
+        modal.classList.remove('hidden');
+        playTone(victory ? 880 : 120, 0.4, victory ? 'square' : 'sawtooth');
+    }
+
+    function resetGame() {
+        location.reload();
+    }
+
+    function log(msg) {
+        document.getElementById('game-log').innerText = msg;
+    }
+
+    window.onload = initGame;
+</script>
+</body>
+</html>

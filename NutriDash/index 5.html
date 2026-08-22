@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NUTRIHERO: Misión Saludable</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="game-wrapper">
+
+    <!-- =========================
+         PANTALLA DE INICIO
+    ========================== -->
+    <section id="startScreen" class="screen active">
+
+        <div class="menu-card">
+
+            <div class="logo">
+                <span>🥦</span>
+                <h1>NUTRIHERO</h1>
+                <span>🍎</span>
+            </div>
+
+            <h2>MISIÓN SALUDABLE</h2>
+
+            <div class="moon-title">
+                🚀 VIAJE A LA LUNA 🌙
+            </div>
+
+            <p class="intro">
+                ¡Conviértete en un NutriHéroe!
+                Atrapa alimentos saludables, evita la comida chatarra
+                y consigue la energía necesaria para llegar a la Luna.
+            </p>
+
+            <button id="startBtn" class="main-button">
+                🚀 COMENZAR MISIÓN
+            </button>
+
+            <button id="tutorialBtn" class="secondary-button">
+                📖 ¿CÓMO JUGAR?
+            </button>
+
+            <button id="rankingBtn" class="secondary-button">
+                🏆 RANKING
+            </button>
+
+            <div class="controls-info">
+                <span>⬅️ ➡️ Mover</span>
+                <span>⏸️ Pausar</span>
+                <span>📱 Táctil</span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         TUTORIAL
+    ========================== -->
+    <section id="tutorialScreen" class="screen">
+
+        <div class="menu-card tutorial-card">
+
+            <h1>🎮 ¿CÓMO JUGAR?</h1>
+
+            <div class="tutorial-grid">
+
+                <div class="tutorial-item good">
+                    <span>🍎</span>
+                    <h3>Alimentos saludables</h3>
+                    <p>Te dan puntos y energía.</p>
+                </div>
+
+                <div class="tutorial-item bad">
+                    <span>🍔</span>
+                    <h3>Comida chatarra</h3>
+                    <p>Te quita energía y oscurece la pantalla.</p>
+                </div>
+
+                <div class="tutorial-item good">
+                    <span>⭐</span>
+                    <h3>Estrella energética</h3>
+                    <p>Da muchos puntos y aumenta tu energía.</p>
+                </div>
+
+                <div class="tutorial-item bad">
+                    <span>☠️</span>
+                    <h3>Virus</h3>
+                    <p>¡Evítalo! Hace mucho daño.</p>
+                </div>
+
+            </div>
+
+            <div class="how-to">
+
+                <h3>🎯 Tu misión</h3>
+
+                <p>
+                    Muévete entre los tres carriles para atrapar
+                    alimentos saludables y evitar los alimentos dañinos.
+                </p>
+
+                <p>
+                    Consigue al menos <strong>500 puntos</strong>
+                    y completa los tres niveles para llegar a la Luna.
+                </p>
+
+            </div>
+
+            <button id="backFromTutorial" class="main-button">
+                ← VOLVER
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         RANKING
+    ========================== -->
+    <section id="rankingScreen" class="screen">
+
+        <div class="menu-card">
+
+            <h1>🏆 NUTRI-RANKING</h1>
+
+            <p>Los mejores NutriHéroes de esta computadora.</p>
+
+            <div id="rankingList" class="ranking-list"></div>
+
+            <button id="backFromRanking" class="main-button">
+                ← VOLVER
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         JUEGO
+    ========================== -->
+    <main id="gameScreen" class="game-screen">
+
+        <div class="hud">
+
+            <div class="hud-box">
+                <span>🏆</span>
+                <div>
+                    <small>PUNTAJE</small>
+                    <strong id="score">0</strong>
+                </div>
+            </div>
+
+            <div class="hud-box">
+                <span>🔥</span>
+                <div>
+                    <small>COMBO</small>
+                    <strong id="combo">x1</strong>
+                </div>
+            </div>
+
+            <div class="hud-box">
+                <span>❤️</span>
+                <div>
+                    <small>VIDAS</small>
+                    <strong id="lives">❤️❤️❤️</strong>
+                </div>
+            </div>
+
+            <div class="hud-box">
+                <span>⏱️</span>
+                <div>
+                    <small>TIEMPO</small>
+                    <strong id="timer">30</strong>
+                </div>
+            </div>
+
+            <button id="pauseBtn" class="pause-button">
+                ⏸️
+            </button>
+
+        </div>
+
+
+        <div class="level-info">
+
+            <span id="levelName">🌎 NIVEL 1 — TIERRA</span>
+
+            <span id="levelProgress">
+                NIVEL 1 / 3
+            </span>
+
+        </div>
+
+
+        <div class="energy-container">
+
+            <div class="energy-label">
+                <span>⚡ ENERGÍA</span>
+                <span id="energyText">100%</span>
+            </div>
+
+            <div class="energy-bar">
+                <div id="energyFill"></div>
+            </div>
+
+        </div>
+
+
+        <div class="canvas-container">
+
+            <canvas id="gameCanvas"></canvas>
+
+            <!-- Oscurecimiento por comida chatarra -->
+            <div id="darkOverlay"></div>
+
+            <div id="levelMessage" class="level-message"></div>
+
+        </div>
+
+
+        <!-- CONTROLES MÓVILES -->
+
+        <div class="mobile-controls">
+
+            <button id="leftBtn">
+                ◀
+            </button>
+
+            <button id="rightBtn">
+                ▶
+            </button>
+
+        </div>
+
+
+        <div class="game-tip">
+            🍎 ¡Atrapa saludable! &nbsp;&nbsp;
+            🍔 ¡Evita la chatarra!
+        </div>
+
+    </main>
+
+
+    <!-- =========================
+         PAUSA
+    ========================== -->
+    <section id="pauseScreen" class="overlay-screen">
+
+        <div class="menu-card">
+
+            <h1>⏸️ JUEGO EN PAUSA</h1>
+
+            <p>
+                Tu misión está esperando.
+            </p>
+
+            <button id="resumeBtn" class="main-button">
+                ▶️ CONTINUAR
+            </button>
+
+            <button id="restartFromPause" class="secondary-button">
+                🔄 REINICIAR
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         PREGUNTA
+    ========================== -->
+    <section id="questionScreen" class="overlay-screen">
+
+        <div class="question-card">
+
+            <div class="question-icon">
+                🧠
+            </div>
+
+            <h2>¡BONUS NUTRICIONAL!</h2>
+
+            <p id="questionText"></p>
+
+            <div id="answers"></div>
+
+            <div id="questionResult"></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         GAME OVER
+    ========================== -->
+    <section id="gameOverScreen" class="screen">
+
+        <div class="menu-card">
+
+            <div class="big-result">
+                💥
+            </div>
+
+            <h1>¡MISIÓN FALLIDA!</h1>
+
+            <p>
+                Tu energía llegó a cero.
+            </p>
+
+            <div class="result-score">
+                Puntaje final:
+                <strong id="finalScore">0</strong>
+            </div>
+
+            <button id="restartBtn" class="main-button">
+                🔄 INTENTAR DE NUEVO
+            </button>
+
+            <button id="gameOverRanking" class="secondary-button">
+                🏆 VER RANKING
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         VICTORIA
+    ========================== -->
+    <section id="victoryScreen" class="screen">
+
+        <div class="menu-card victory-card">
+
+            <div class="big-result">
+                🌙🚀
+            </div>
+
+            <h1>¡MISIÓN COMPLETADA!</h1>
+
+            <h2>¡LLEGASTE A LA LUNA!</h2>
+
+            <p>
+                Has demostrado que sabes elegir
+                alimentos saludables.
+            </p>
+
+            <div class="result-stats">
+
+                <div>
+                    <span>🏆</span>
+                    <strong id="victoryScore">0</strong>
+                    <small>PUNTOS</small>
+                </div>
+
+                <div>
+                    <span>🔥</span>
+                    <strong id="victoryCombo">x1</strong>
+                    <small>MEJOR COMBO</small>
+                </div>
+
+                <div>
+                    <span>⚡</span>
+                    <strong id="victoryEnergy">100%</strong>
+                    <small>ENERGÍA</small>
+                </div>
+
+            </div>
+
+            <input
+                type="text"
+                id="playerName"
+                maxlength="12"
+                placeholder="Escribe tu nombre"
+            >
+
+            <button id="saveScoreBtn" class="main-button">
+                🏆 GUARDAR EN RANKING
+            </button>
+
+            <button id="victoryRestart" class="secondary-button">
+                🔄 JUGAR OTRA VEZ
+            </button>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

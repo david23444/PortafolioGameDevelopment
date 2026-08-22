@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ecos del Silencio - Novela Visual</title>
+
+    <style>
+        :root {
+            --bg-dark: #0b0b0d;
+            --panel-bg: rgba(15, 15, 18, 0.88);
+            --text-light: #f5f5f5;
+            --text-muted: #b4b4b8;
+            --primary: #6ea8fe;
+            --danger: #e66a6a;
+            --success: #72d59a;
+            --border-color: rgba(255,255,255,0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background:
+                radial-gradient(circle at center, #1b1b20 0%, #080809 75%);
+            color: var(--text-light);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            overflow: hidden;
+        }
+
+        /* =========================================================
+           CONTENEDOR PRINCIPAL
+        ========================================================= */
+
+        #game-container {
+            width: 100%;
+            max-width: 1150px;
+            height: 92vh;
+            max-height: 780px;
+
+            position: relative;
+            overflow: hidden;
+
+            background: #080808;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 30px 80px rgba(0,0,0,0.85),
+                0 0 0 1px rgba(255,255,255,0.04);
+
+            isolation: isolate;
+        }
+
+        /* =========================================================
+           CAPA DE IMAGEN
+        ========================================================= */
+
+        #scene-bg {
+            position: absolute;
+            inset: 0;
+
+            z-index: 1;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    #27272d 0%,
+                    #111114 45%,
+                    #050506 100%
+                );
+
+            background-size: cover;
+            background-position: center;
+
+            transition:
+                opacity 0.7s ease,
+                transform 1.2s ease,
+                background-image 0.3s ease;
+        }
+
+        #scene-bg.scene-transition {
+            transform: scale(1.025);
+        }
+
+        /* Overlay dramático */
+
+        #scene-bg::after {
+            content: "";
+
+            position: absolute;
+            inset: 0;
+
+            background:
+                linear-gradient(
+                    to bottom,
+                    rgba(5,5,7,0.72) 0%,
+                    rgba(5,5,7,0.28) 34%,
+                    rgba(5,5,7,0.32) 50%,
+                    rgba(5,5,7,0.96) 100%
+                );
+
+            pointer-events: none;
+        }
+
+        /* =========================================================
+           PANTALLA DE CARGA DE ESCENA
+        ========================================================= */
+
+        #scene-loader {
+            position: absolute;
+            inset: 0;
+
+            z-index: 20;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: rgba(0,0,0,0.22);
+
+            pointer-events: none;
+
+            opacity: 0;
+
+            transition: opacity 0.25s ease;
+        }
+
+        #scene-loader.active {
+            opacity: 1;
+        }
+
+        .loader-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            gap: 12px;
+
+            color: rgba(255,255,255,0.65);
+            font-size: 12px;
+
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .loader-spinner {
+            width: 28px;
+            height: 28px;
+
+            border-radius: 50%;
+
+            border: 2px solid rgba(255,255,255,0.15);
+            border-top-color: rgba(255,255,255,0.8);
+
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* =========================================================
+           TITULO
+        ========================================================= */
+
+        #game-title {
+            position: absolute;
+
+            top: 28px;
+            left: 32px;
+
+            z-index: 10;
+
+            letter-spacing: 5px;
+            text-transform: uppercase;
+
+            font-size: 12px;
+
+            color: rgba(255,255,255,0.65);
+
+            text-shadow:
+                0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        #game-title strong {
+            color: white;
+            font-weight: 600;
+        }
+
+        /* =========================================================
+           UI SUPERIOR
+        ========================================================= */
+
+        #ui-top {
+            position: absolute;
+
+            top: 26px;
+            right: 30px;
+            left: 30px;
+
+            z-index: 10;
+
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+
+            pointer-events: none;
+        }
+
+        #conscience-panel {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            padding: 12px 18px;
+
+            border:
+                1px solid var(--border-color);
+
+            background:
+                rgba(15,15,18,0.72);
+
+            backdrop-filter: blur(10px);
+
+            border-radius: 8px;
+
+            box-shadow:
+                0 8px 30px rgba(0,0,0,0.35);
+        }
+
+        #conscience-label {
+            font-size: 11px;
+
+            font-weight: 600;
+
+            letter-spacing: 2px;
+            text-transform: uppercase;
+
+            color: rgba(255,255,255,0.75);
+        }
+
+        #karma-container {
+            width: 230px;
+            height: 7px;
+
+            background: rgba(255,255,255,0.10);
+
+            border-radius: 10px;
+
+            overflow: hidden;
+        }
+
+        #karma-bar {
+            height: 100%;
+
+            width: 0%;
+
+            background:
+                linear-gradient(
+                    to right,
+                    #555,
+                    var(--primary)
+                );
+
+            border-radius: 10px;
+
+            transition:
+                width 0.7s ease,
+                background 0.5s ease;
+        }
+
+        #karma-value {
+            min-width: 35px;
+
+            font-size: 11px;
+
+            text-align: right;
+
+            color: rgba(255,255,255,0.55);
+        }
+
+        /* =========================================================
+           DIALOGO
+        ========================================================= */
+
+        #dialogue-section {
+            position: absolute;
+
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            z-index: 10;
+
+            padding:
+                80px
+                55px
+                40px;
+
+            display: flex;
+            flex-direction: column;
+            gap: 17px;
+
+            background:
+                linear-gradient(
+                    to top,
+                    rgba(5,5,7,0.96) 0%,
+                    rgba(5,5,7,0.84) 38%,
+                    transparent 100%
+                );
+        }
+
+        #speaker-name {
+            margin: 0;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            letter-spacing: 3px;
+
+            text-transform: uppercase;
+
+            color: var(--primary);
+
+            text-shadow:
+                0 2px 10px rgba(0,0,0,0.9);
+        }
+
+        #narrative-text {
+            margin: 0;
+
+            max-width: 900px;
+
+            min-height: 74px;
+
+            font-size: 19px;
+
+            line-height: 1.65;
+
+            color: var(--text-light);
+
+            text-shadow:
+                0 2px 8px rgba(0,0,0,0.95);
+
+            transition:
+                opacity 0.3s ease,
+                transform 0.3s ease;
+        }
+
+        #narrative-text.fade {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        /* =========================================================
+           OPCIONES
+        ========================================================= */
+
+        #choices-container {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+            margin-top: 8px;
+        }
+
+        .btn-choice {
+            width: 100%;
+
+            padding:
+                15px
+                20px;
+
+            border:
+                1px solid rgba(255,255,255,0.13);
+
+            border-radius: 7px;
+
+            background:
+                rgba(20,20,24,0.80);
+
+            backdrop-filter: blur(8px);
+
+            color: var(--text-muted);
+
+            font-family: inherit;
+
+            font-size: 15px;
+
+            text-align: left;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                border-color 0.2s ease,
+                color 0.2s ease;
+        }
+
+        .btn-choice:hover {
+            transform: translateX(7px);
+
+            background:
+                rgba(40,40,46,0.88);
+
+            border-color:
+                rgba(255,255,255,0.28);
+
+            color: white;
+        }
+
+        .btn-choice:active {
+            transform: translateX(4px);
+        }
+
+        .btn-choice::before {
+            content: "›";
+
+            display: inline-block;
+
+            margin-right: 12px;
+
+            color: rgba(255,255,255,0.3);
+
+            transition:
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .btn-choice:hover::before {
+            color: var(--primary);
+            transform: translateX(3px);
+        }
+
+        .btn-restart {
+            text-align: center;
+
+            color: var(--primary);
+
+            border-color:
+                rgba(110,168,254,0.4);
+
+            background:
+                rgba(110,168,254,0.10);
+        }
+
+        .btn-restart:hover {
+            background:
+                rgba(110,168,254,0.22);
+
+            border-color:
+                var(--primary);
+
+            color: white;
+
+            transform: none;
+        }
+
+        .btn-restart::before {
+            content: "";
+            margin: 0;
+        }
+
+        /* =========================================================
+           INDICADOR DE ESCENA
+        ========================================================= */
+
+        #scene-indicator {
+            position: absolute;
+
+            bottom: 22px;
+            right: 28px;
+
+            z-index: 11;
+
+            font-size: 10px;
+
+            letter-spacing: 2px;
+
+            color: rgba(255,255,255,0.35);
+
+            text-transform: uppercase;
+        }
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 800px) {
+
+            body {
+                align-items: stretch;
+            }
+
+            #game-container {
+                width: 100%;
+                height: 100vh;
+                max-height: none;
+
+                border-radius: 0;
+            }
+
+            #game-title {
+                left: 20px;
+                top: 20px;
+            }
+
+            #ui-top {
+                top: 65px;
+                left: 20px;
+                right: 20px;
+
+                justify-content: flex-start;
+            }
+
+            #dialogue-section {
+                padding:
+                    80px
+                    22px
+                    30px;
+            }
+
+            #narrative-text {
+                font-size: 17px;
+            }
+
+            #karma-container {
+                width: 150px;
+            }
+
+            #scene-indicator {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="game-container">
+
+    <!-- =========================================================
+         FONDO
+    ========================================================== -->
+
+    <div id="scene-bg"></div>
+
+    <!-- =========================================================
+         CARGADOR
+    ========================================================== -->
+
+    <div id="scene-loader">
+
+        <div class="loader-content">
+
+            <div class="loader-spinner"></div>
+
+            <span>Cargando escena...</span>
+
+        </div>
+
+    </div>
+
+    <!-- =========================================================
+         TITULO
+    ========================================================== -->
+
+    <div id="game-title">
+        <strong>Ecos del Silencio</strong>
+        · Novela Visual
+    </div>
+
+    <!-- =========================================================
+         UI SUPERIOR
+    ========================================================== -->
+
+    <div id="ui-top">
+
+        <div id="conscience-panel">
+
+            <span id="conscience-label">
+                Conciencia
+            </span>
+
+            <div id="karma-container">
+
+                <div id="karma-bar"></div>
+
+            </div>
+
+            <span id="karma-value">
+                0%
+            </span>
+
+        </div>
+
+    </div>
+
+    <!-- =========================================================
+         DIALOGO
+    ========================================================== -->
+
+    <section id="dialogue-section">
+
+        <p id="speaker-name"></p>
+
+        <p id="narrative-text"></p>
+
+        <div id="choices-container"></div>
+
+    </section>
+
+    <!-- =========================================================
+         INDICADOR
+    ========================================================== -->
+
+    <div id="scene-indicator">
+        Escena 1
+    </div>
+
+</div>
+
+
+<script>
+
+/* ================================================================
+   CONFIGURACIÓN
+================================================================ */
+
+const TOTAL_DECISIONES = 9;
+
+let puntosConciencia = 0;
+let decisionesTomadas = 0;
+
+/*
+    Identificador de la partida actual.
+
+    Cada vez que reiniciamos el juego cambia,
+    así las imágenes también pueden cambiar.
+*/
+let idPartida = Date.now();
+
+
+/* ================================================================
+   ELEMENTOS HTML
+================================================================ */
+
+const sceneBg =
+    document.getElementById("scene-bg");
+
+const sceneLoader =
+    document.getElementById("scene-loader");
+
+const speakerName =
+    document.getElementById("speaker-name");
+
+const narrativeText =
+    document.getElementById("narrative-text");
+
+const choicesContainer =
+    document.getElementById("choices-container");
+
+const karmaBar =
+    document.getElementById("karma-bar");
+
+const karmaValue =
+    document.getElementById("karma-value");
+
+const sceneIndicator =
+    document.getElementById("scene-indicator");
+
+
+/* ================================================================
+   GENERADOR DE IMÁGENES POR ESCENA
+================================================================ */
+
+/*
+    IMPORTANTE:
+
+    Ya NO guardamos una URL de imagen fija dentro de historia.
+
+    En su lugar guardamos solamente keywords.
+
+    Cada vez que entramos a una escena:
+       1. Generamos una URL nueva.
+       2. La precargamos.
+       3. Cuando termina de cargar, la mostramos.
+
+    De esta forma cada transición puede tener
+    una imagen diferente.
+*/
+
+function generarImagenEscena(
+    keywords,
+    escenaId
+) {
+
+    /*
+        Convertimos:
+
+        "dark bedroom night"
+
+        en:
+
+        "dark,bedroom,night"
+    */
+
+    const consulta =
+        keywords
+            .trim()
+            .replace(/\s+/g, ",");
+
+
+    /*
+        El seed combina:
+
+        - ID de partida
+        - escena
+        - número aleatorio
+
+        Así evitamos que todas las escenas
+        terminen utilizando exactamente
+        la misma imagen.
+    */
+
+    const seed =
+        `${idPartida}-${escenaId}-${Math.floor(
+            Math.random() * 100000
+        )}`;
+
+
+    /*
+        LoremFlickr
+
+        lock diferente = imagen diferente
+    */
+
+    return {
+        principal:
+            `https://loremflickr.com/1200/700/${consulta}?lock=${encodeURIComponent(seed)}`,
+
+        fallback:
+            `https://picsum.photos/seed/${encodeURIComponent(seed)}/1200/700`
+    };
+}
+
+
+/* ================================================================
+   PRECARGAR IMAGEN
+================================================================ */
+
+function cargarImagen(urlPrincipal, urlFallback) {
+
+    return new Promise((resolve) => {
+
+        sceneLoader.classList.add("active");
+
+
+        /* ========================================================
+           INTENTAR IMAGEN PRINCIPAL
+        ======================================================== */
+
+        const imagenPrincipal =
+            new Image();
+
+        imagenPrincipal.onload = () => {
+
+            mostrarImagen(
+                urlPrincipal
+            );
+
+            resolve(true);
+        };
+
+
+        imagenPrincipal.onerror = () => {
+
+            console.warn(
+                "La imagen dinámica falló. Usando fallback."
+            );
+
+
+            /* ====================================================
+               FALLBACK
+            ==================================================== */
+
+            const imagenFallback =
+                new Image();
+
+            imagenFallback.onload = () => {
+
+                mostrarImagen(
+                    urlFallback
+                );
+
+                resolve(true);
+            };
+
+
+            imagenFallback.onerror = () => {
+
+                console.warn(
+                    "Fallaron tanto la imagen principal como el fallback."
+                );
+
+
+                /*
+                    Nunca dejamos la pantalla completamente negra.
+                */
+
+                sceneBg.style.backgroundImage = `
+                    radial-gradient(
+                        circle at center,
+                        #34343a 0%,
+                        #16161a 50%,
+                        #050506 100%
+                    )
+                `;
+
+                sceneBg.style.opacity = "1";
+
+                sceneLoader.classList.remove(
+                    "active"
+                );
+
+                resolve(false);
+            };
+
+
+            imagenFallback.src =
+                urlFallback;
+        };
+
+
+        imagenPrincipal.src =
+            urlPrincipal;
+
+    });
+}
+
+
+/* ================================================================
+   MOSTRAR IMAGEN
+================================================================ */
+
+function mostrarImagen(url) {
+
+    /*
+        Primero hacemos desaparecer ligeramente
+        la imagen actual.
+    */
+
+    sceneBg.style.opacity = "0.15";
+
+    sceneBg.classList.add(
+        "scene-transition"
+    );
+
+
+    setTimeout(() => {
+
+        /*
+            Aquí ocurre realmente
+            el cambio de imagen.
+        */
+
+        sceneBg.style.backgroundImage =
+            `url("${url}")`;
+
+        sceneBg.style.opacity = "1";
+
+
+        setTimeout(() => {
+
+            sceneBg.classList.remove(
+                "scene-transition"
+            );
+
+        }, 900);
+
+
+        sceneLoader.classList.remove(
+            "active"
+        );
+
+    }, 200);
+}
+
+
+/* ================================================================
+   HISTORIA
+================================================================ */
+
+const historia = {
+
+    acto1: {
+
+        escena: 1,
+
+        imagenKeywords:
+            "dark bedroom night letter lonely",
+
+        personaje:
+            "Narrador",
+
+        texto:
+            `
+            La habitación está casi a oscuras.
+
+            Sobre el escritorio hay una carta doblada varias veces.
+
+            Es de tu padre.
+
+            Hace unos días falleció después de pasar demasiado tiempo soportando el acoso constante que sufría en su trabajo.
+
+            Durante años nunca quisiste escuchar demasiado sobre aquello.
+
+            Siempre pensaste que simplemente debía aguantar.
+
+            Ahora estás solo frente a sus últimas palabras.
+            `,
+
+        opciones: [
+
+            {
+                texto:
+                    "Leer la carta e intentar comprender por lo que estaba pasando.",
+
+                karma: 1,
+
+                siguiente: "acto2"
+            },
+
+            {
+                texto:
+                    "Guardar la carta sin leerla. No quieres enfrentarte a nada de esto.",
+
+                karma: 0,
+
+                siguiente: "acto2"
+            }
+
+        ]
+
+    },
+
+
+    acto2: {
+
+        escena: 2,
+
+        imagenKeywords:
+            "teen bedroom phone night message",
+
+        personaje:
+            "Teléfono — Marcos",
+
+        texto:
+            `
+            Tu teléfono vibra.
+
+            Es Marcos.
+
+            "Bro, me enteré de lo de tu viejo. ¿Estás bien? Los chicos y yo vamos a salir un rato. Vamos a pintar unas paredes. Vente."
+
+            Durante unos segundos miras la pantalla.
+
+            Marcos ha sido tu amigo desde hace años.
+
+            También ha sido la persona que más veces te ha empujado a hacer cosas que normalmente no harías.
+            `,
+
+        opciones: [
+
+            {
+                texto:
+                    "Responder: «No estoy bien. Necesito despejarme un poco, pero no quiero hacer tonterías.»",
+
+                karma: 1,
+
+                siguiente: "acto3"
+            },
+
+            {
+                texto:
+                    "Responder: «Claro. Necesito distraerme. Voy para allá.»",
+
+                karma: 0,
+
+                siguiente: "acto3"
+            }
+
+        ]
+
+    },
+
+
+    acto3: {
+
+        escena: 3,
+
+        imagenKeywords:
+            "high school entrance teenagers morning",
+
+        personaje:
+            "Pensamiento interno",
+
+        texto:
+            `
+            A la mañana siguiente vuelves al instituto.
+
+            Marcos, Diego, Alex y Samuel están esperándote en la entrada.
+
+            Todos hacen bromas como siempre.
+
+            Te ríes por inercia.
+
+            Pero algo ha cambiado.
+
+            Antes te parecía divertido ser el que siempre tenía el comentario más pesado.
+
+            Ahora recuerdas la carta sobre tu escritorio.
+            `,
+
+        opciones: [
+
+            {
+                texto:
+                    "Observar a tus amigos antes de decidir cómo comportarte con ellos.",
+
+                karma: 1,
+
+                siguiente: "acto4"
+            },
+
+            {
+                texto:
+                    "Actuar como siempre para que nadie note que estás diferente.",
+
+                karma: 0,
+
+                siguiente: "acto4"
+            }
+
+        ]
+
+    },
+
+
+    acto4: {
+
+        escena: 4,
+
+        imagenKeywords:
+            "school hallway student bullying tense",
+
+        personaje:
+            "Narrador",
+
+        texto:
+            `
+            Al llegar al pasillo escuchas risas.
+
+            Marcos y los demás tienen rodeado a un estudiante de primer año.
+
+            Sus libros están tirados en el suelo.
+
+            El chico intenta recogerlos mientras los demás se burlan.
+
+            Entonces levanta la mirada.
+
+            Y por alguna razón te quedas quieto.
+
+            Tiene la misma expresión que viste tantas veces en los ojos de tu padre cuando hablaba de su trabajo.
+            `,
+
+        opciones: [
+
+            {
+                texto:
+                    "Detenerte y observar lo que realmente está ocurriendo.",
+
+                karma: 1,
+
+                siguiente: "acto5"
+            },
+
+            {
+                texto:
+                    "Seguir caminando. No quieres meterte en problemas con tus amigos.",
+
+                karma: 0,
+
+                siguiente: "acto5"
+            }
+
+        ]
+
+    },
+
+
+    acto5: {
+
+        escena: 5,
+
+        imagenKeywords:
+            "school stairway teenagers argument tense",
+
+        personaje:
+            "Marcos",
+
+        texto:
+            `
+            Marcos te hace una seña.
+
+            "Ven. Estamos enseñándole una lección."
+
+            Los demás se ríen.
+
+            El chico de primer año permanece en silencio.
+
+            Por primera vez empiezas a notar algo que antes nunca querías reconocer:
+
+            ninguno de ellos está realmente riéndose por diversión.
+
+            Todos están siguiendo a alguien.
+
+            Y ese alguien es Marcos.
+            `,
+
+        opciones: [
+
+            {
+                texto:
+                    "Preguntar qué ha hecho realmente el chico y pedir que lo dejen tranquilo.",
+
+                karma: 1,
+
+                siguiente: "acto6"
+            },
+
+            {
+                texto:
+                    "Reírte con ellos para evitar convertirte en el siguiente objetivo.",
+
+                karma: 0,
+
+                siguiente: "acto6"
+            }
+
+        ]
+
+    },
+
+
+    acto6: {
+
+        escena: 6,
+
+        imagenKeywords:
+            "school courtyard lonely student afternoon",
+
+        personaje:
+            "Narrador",
+
+        texto:
+            `
+            Más tarde encuentras al chico solo en una banca.
+
+            Tiene sus cosas a su lado.
+
+            No parece enfadado.
+
+            Parece cansado.
+
+            Te acercas unos pasos.
+
+            Él te reconoce.
+
+            "Tú estabas con ellos."
+
+            No sabes qué responder.
+
+            Porque tiene razón.
+            `,
+
+        opciones: [
+
+            {
+                texto:
+                    "Sentarte a hablar con él y admitir que no estuvo bien quedarse mirando.",
+
+                karma: 1,
+
+                siguiente: "acto7"
+            },
+
+            {
+                texto:
+                    "Decirle que simplemente estabas ahí por casualidad y marcharte.",
+
+                karma: 0,
+
+                siguiente: "acto7"
+            }
+
+        ]
+
+    },
+
+
+    acto7: {
+
+        escena: 7,
+
+        imagenKeywords:
+            "teen walking city evening lonely reflection",
+
+        personaje:
+            "Pensamiento interno",
+
+        texto:
+            `
+            Esa tarde caminas solo de regreso a casa.
+
+            Piensas en tu padre.
+
+            En sus silencios.
+
+            En todas las veces que viste a alguien ser apartado, humillado o ridiculizado y decidiste mirar hacia otro lado.
+
+            También piensas en algo todavía más incómodo:
+
+            quizá el problema nunca fue solamente Marcos.
+
+            Quizá tú también ayudaste a construir ese ambiente.
+            `,
+
+        opciones: [
+
+            {
+                texto:
+                    "Aceptar que también has sido parte del problema.",
+
+                karma: 1,
+
+                siguiente: "acto8"
+            },
+
+            {
+                texto:
+                    "Convencerte de que todo esto no tiene nada que ver contigo.",
+
+                karma: 0,
+
+                siguiente: "acto8"
+            }
+
+        ]
+
+    },
+
+
+    acto8: {
+
+        escena: 8,
+
+        imagenKeywords:
+            "school hallway confrontation teenagers",
+
+        personaje:
+            "Marcos",
+
+        texto:
+            `
+            Al día siguiente Marcos te espera.
+
+            "¿Qué te pasa últimamente?"
+
+            Te observa durante unos segundos.
+
+            "Antes eras tú el que empezaba estas cosas."
+
+            Silencio.
+
+            "Ahora parece que te importa todo."
+
+            Miras alrededor.
+
+            Él está esperando que vuelvas a ser el de antes.
+            `,
+
+        opciones: [
+
+            {
+                texto:
+                    "Decirle que ya no quieres participar en estas cosas y que debería dejar al chico en paz.",
+
+                karma: 1,
+
+                siguiente: "acto9"
+            },
+
+            {
+                texto:
+                    "Decirle que tiene razón y aceptar volver con el grupo.",
+
+                karma: 0,
+
+                siguiente: "acto9"
+            }
+
+        ]
+
+    },
+
+
+    acto9: {
+
+        escena: 9,
+
+        imagenKeywords:
+            "school hallway group confrontation dramatic",
+
+        personaje:
+            "Narrador",
+
+        texto:
+            `
+            Después de clases vuelves a encontrarlos.
+
+            El grupo vuelve a tener al chico acorralado.
+
+            Marcos te lanza una lata de pintura.
+
+            "Termínalo tú."
+
+            Todos esperan.
+
+            Esta vez no hay excusas.
+
+            No puedes fingir que no viste nada.
+
+            No puedes decir que simplemente estabas allí.
+
+            La decisión es tuya.
+            `,
+
+        opciones: [
+
+            {
+                texto:
+                    "Tirar la lata, enfrentarte a Marcos y decir: «Se acabó. Déjenlo tranquilo.»",
+
+                karma: 1,
+
+                siguiente: "final"
+            },
+
+            {
+                texto:
+                    "Tomar la lata y seguir al grupo para no quedar fuera.",
+
+                karma: 0,
+
+                siguiente: "final"
+            }
+
+        ]
+
+    },
+
+
+    /* ============================================================
+       FINAL BUENO
+    ============================================================ */
+
+    finalBueno: {
+
+        escena: "Final",
+
+        imagenKeywords:
+            "sunrise forest path hopeful cinematic",
+
+        personaje:
+            "Final — Redención",
+
+        texto:
+            `
+            El grupo se queda en silencio.
+
+            Marcos te mira como si ya no reconociera a la persona que tiene delante.
+
+            Puede que hayas perdido a tus amigos.
+
+            Pero por primera vez en mucho tiempo sientes que recuperaste algo.
+
+            No puedes cambiar lo que ocurrió con tu padre.
+
+            Tampoco puedes borrar las decisiones que tomaste antes.
+
+            Pero puedes decidir qué hacer a partir de ahora.
+
+            El ciclo no terminó porque olvidaras el pasado.
+
+            Terminó porque decidiste no repetirlo.
+            `,
+
+        opciones: [
+
+            {
+                texto:
+                    "Volver a jugar",
+
+                reiniciar: true,
+
+                siguiente: "acto1"
+            }
+
+        ]
+
+    },
+
+
+    /* ============================================================
+       FINAL MALO
+    ============================================================ */
+
+    finalMalo: {
+
+        escena: "Final",
+
+        imagenKeywords:
+            "dark empty hallway lonely teenager",
+
+        personaje:
+            "Final — La Caída",
+
+        texto:
+            `
+            La pintura termina sobre la mochila.
+
+            Los demás ríen.
+
+            Tú intentas reír también.
+
+            Pero algo dentro de ti permanece completamente en silencio.
+
+            Por un instante recuerdas la carta de tu padre.
+
+            Y entiendes la peor parte:
+
+            el dolor no desapareció.
+
+            Simplemente encontraste una forma de pasárselo a otra persona.
+
+            Quizá todavía puedas cambiar.
+
+            Pero esta vez tendrás que comenzar desde mucho más atrás.
+            `,
+
+        opciones: [
+
+            {
+                texto:
+                    "Intentar de nuevo",
+
+                reiniciar: true,
+
+                siguiente: "acto1"
+            }
+
+        ]
+
+    }
+
+};
+
+
+/* ================================================================
+   BARAJAR OPCIONES
+================================================================ */
+
+function barajarOpciones(opciones) {
+
+    const copia = [...opciones];
+
+    for (
+        let i = copia.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() * (i + 1)
+            );
+
+        [
+            copia[i],
+            copia[j]
+        ] =
+        [
+            copia[j],
+            copia[i]
+        ];
+    }
+
+    return copia;
+}
+
+
+/* ================================================================
+   CARGAR ESCENA
+================================================================ */
+
+async function cargarEscena(escenaId) {
+
+    const escena =
+        historia[escenaId];
+
+    if (!escena) {
+
+        console.error(
+            "No existe la escena:",
+            escenaId
+        );
+
+        return;
+    }
+
+
+    /* ============================================================
+       GENERAR NUEVA IMAGEN
+    ============================================================ */
+
+    const imagen =
+        generarImagenEscena(
+            escena.imagenKeywords,
+            escenaId
+        );
+
+
+    /*
+        AQUÍ está la diferencia importante.
+
+        Cada vez que se ejecuta cargarEscena():
+
+            escena anterior
+                    ↓
+            generar nueva URL
+                    ↓
+            descargar imagen
+                    ↓
+            mostrar nueva imagen
+    */
+
+    await cargarImagen(
+        imagen.principal,
+        imagen.fallback
+    );
+
+
+    /* ============================================================
+       INDICADOR
+    ============================================================ */
+
+    sceneIndicator.innerText =
+        typeof escena.escena === "number"
+            ? `Escena ${escena.escena}`
+            : "Final";
+
+
+    /* ============================================================
+       PERSONAJE
+    ============================================================ */
+
+    speakerName.innerText =
+        escena.personaje;
+
+
+    if (
+        escena.personaje.includes("Redención")
+    ) {
+
+        speakerName.style.color =
+            "var(--success)";
+
+    }
+
+    else if (
+        escena.personaje.includes("Caída")
+    ) {
+
+        speakerName.style.color =
+            "var(--danger)";
+
+    }
+
+    else {
+
+        speakerName.style.color =
+            "var(--primary)";
+    }
+
+
+    /* ============================================================
+       TEXTO
+    ============================================================ */
+
+    narrativeText.classList.add(
+        "fade"
+    );
+
+    setTimeout(() => {
+
+        narrativeText.innerHTML =
+            escena.texto.trim();
+
+        narrativeText.classList.remove(
+            "fade"
+        );
+
+    }, 150);
+
+
+    /* ============================================================
+       LIMPIAR OPCIONES
+    ============================================================ */
+
+    choicesContainer.innerHTML = "";
+
+
+    /* ============================================================
+       MEZCLAR OPCIONES
+    ============================================================ */
+
+    const opciones =
+        escena.opciones.length > 1
+            ? barajarOpciones(
+                escena.opciones
+            )
+            : escena.opciones;
+
+
+    /* ============================================================
+       CREAR BOTONES
+    ============================================================ */
+
+    opciones.forEach((opcion) => {
+
+        const boton =
+            document.createElement("button");
+
+
+        boton.className =
+            opcion.reiniciar
+                ? "btn-choice btn-restart"
+                : "btn-choice";
+
+
+        boton.innerText =
+            opcion.texto;
+
+
+        boton.onclick = () => {
+
+
+            /* ====================================================
+               REINICIO
+            ==================================================== */
+
+            if (opcion.reiniciar) {
+
+                /*
+                    Nuevo ID de partida.
+
+                    Esto hará que incluso al volver
+                    a la escena 1 pueda aparecer
+                    una imagen diferente.
+                */
+
+                idPartida =
+                    Date.now() +
+                    Math.floor(
+                        Math.random() * 100000
+                    );
+
+
+                puntosConciencia = 0;
+
+                decisionesTomadas = 0;
+
+                actualizarBarraKarma();
+
+
+                cargarEscena(
+                    opcion.siguiente
+                );
+
+                return;
+            }
+
+
+            /* ====================================================
+               SUMAR DECISIÓN
+            ==================================================== */
+
+            puntosConciencia +=
+                opcion.karma;
+
+            decisionesTomadas++;
+
+
+            actualizarBarraKarma();
+
+
+            /* ====================================================
+               DESACTIVAR BOTONES
+            ==================================================== */
+
+            const botones =
+                document.querySelectorAll(
+                    ".btn-choice"
+                );
+
+            botones.forEach(
+                boton => {
+
+                    boton.disabled = true;
+
+                    boton.style.pointerEvents =
+                        "none";
+
+                }
+            );
+
+
+            /* ====================================================
+               IR AL FINAL
+            ==================================================== */
+
+            if (
+                opcion.siguiente ===
+                "final"
+            ) {
+
+                setTimeout(() => {
+
+                    /*
+                        5 de 9 = redención.
+
+                        Menos de eso = caída.
+                    */
+
+                    if (
+                        puntosConciencia >= 5
+                    ) {
+
+                        cargarEscena(
+                            "finalBueno"
+                        );
+
+                    }
+
+                    else {
+
+                        cargarEscena(
+                            "finalMalo"
+                        );
+                    }
+
+                }, 450);
+
+
+                return;
+            }
+
+
+            /* ====================================================
+               SIGUIENTE ESCENA
+            ==================================================== */
+
+            setTimeout(() => {
+
+                cargarEscena(
+                    opcion.siguiente
+                );
+
+            }, 350);
+
+        };
+
+
+        choicesContainer.appendChild(
+            boton
+        );
+
+    });
+
+}
+
+
+/* ================================================================
+   BARRA DE CONCIENCIA
+================================================================ */
+
+function actualizarBarraKarma() {
+
+    const porcentaje =
+        Math.round(
+            (
+                puntosConciencia /
+                TOTAL_DECISIONES
+            ) * 100
+        );
+
+
+    karmaBar.style.width =
+        `${porcentaje}%`;
+
+
+    karmaValue.innerText =
+        `${porcentaje}%`;
+
+
+    if (porcentaje >= 56) {
+
+        karmaBar.style.background =
+            "linear-gradient(90deg, #4eae76, #72d59a)";
+
+    }
+
+    else if (porcentaje > 0) {
+
+        karmaBar.style.background =
+            "linear-gradient(90deg, #a45b5b, #e66a6a)";
+
+    }
+
+    else {
+
+        karmaBar.style.background =
+            "#555";
+    }
+
+}
+
+
+/* ================================================================
+   INICIAR JUEGO
+================================================================ */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        puntosConciencia = 0;
+
+        decisionesTomadas = 0;
+
+        actualizarBarraKarma();
+
+
+        /*
+            Primera escena.
+        */
+
+        cargarEscena(
+            "acto1"
+        );
+
+    }
+);
+
+</script>
+
+</body>
+</html>

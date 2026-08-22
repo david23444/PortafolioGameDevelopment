@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoRush</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- MENÚ -->
+    <div id="menu" class="pantalla activa">
+
+        <div class="tarjeta menu">
+
+            <div class="logo">
+                <div class="logo-icon">E</div>
+
+                <div>
+                    <h1>Eco<span>Rush</span></h1>
+                    <p>Corre. Recoge. Recicla.</p>
+                </div>
+            </div>
+
+            <div class="decoracion">
+                <div class="sol"></div>
+                <div class="nube nube1"></div>
+                <div class="nube nube2"></div>
+
+                <div class="edificio e1"></div>
+                <div class="edificio e2"></div>
+                <div class="edificio e3"></div>
+
+                <div class="arbol">♣</div>
+                <div class="arbol arbol2">♣</div>
+            </div>
+
+            <h2>Ayuda a limpiar la ciudad</h2>
+
+            <p class="descripcion">
+                Recoge los residuos y colócalos en el contenedor correcto.
+                ¡Aprende a reciclar mientras juegas!
+            </p>
+
+            <button class="boton principal" onclick="iniciarJuego()">
+                JUGAR
+            </button>
+
+            <button class="boton secundario" onclick="mostrarComoJugar()">
+                COMO JUGAR
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- COMO JUGAR -->
+    <div id="instrucciones" class="pantalla">
+
+        <div class="tarjeta">
+
+            <button class="cerrar" onclick="volverMenu()">X</button>
+
+            <h2>¿Cómo jugar?</h2>
+
+            <div class="pasos">
+
+                <div>
+                    <strong>1</strong>
+                    <h3>Busca</h3>
+                    <p>Encuentra los residuos en la ciudad.</p>
+                </div>
+
+                <div>
+                    <strong>2</strong>
+                    <h3>Selecciona</h3>
+                    <p>Haz clic sobre un residuo.</p>
+                </div>
+
+                <div>
+                    <strong>3</strong>
+                    <h3>Recicla</h3>
+                    <p>Elige el contenedor correcto.</p>
+                </div>
+
+            </div>
+
+            <div class="consejo">
+                Una respuesta correcta suma puntos.
+                Una respuesta incorrecta te hace perder una vida.
+            </div>
+
+            <button class="boton principal" onclick="iniciarJuego()">
+                COMENZAR
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- JUEGO -->
+    <div id="juego" class="pantalla">
+
+        <header>
+
+            <div class="mini-logo">E</div>
+            <strong>EcoRush</strong>
+
+            <div class="datos">
+                <span>Nivel <b id="nivel">1</b></span>
+                <span>Puntos <b id="puntos">0</b></span>
+                <span>Tiempo <b id="tiempo">60</b></span>
+                <span>Vidas <b id="vidas">3</b></span>
+            </div>
+
+        </header>
+
+
+        <div class="escenario">
+
+            <div class="sol juego-sol"></div>
+
+            <div class="nube nube-juego"></div>
+
+            <div class="ciudad">
+
+                <div class="edificio ciudad1"></div>
+                <div class="edificio ciudad2"></div>
+                <div class="edificio ciudad3"></div>
+
+            </div>
+
+            <div id="basura"></div>
+
+            <div class="mensaje" id="mensaje"></div>
+
+            <div class="contenedores">
+
+                <div>
+                    <button class="contenedor papel"
+                            onclick="clasificar('papel')">
+                        P
+                    </button>
+                    <small>Papel</small>
+                </div>
+
+                <div>
+                    <button class="contenedor plastico"
+                            onclick="clasificar('plastico')">
+                        PL
+                    </button>
+                    <small>Plástico</small>
+                </div>
+
+                <div>
+                    <button class="contenedor vidrio"
+                            onclick="clasificar('vidrio')">
+                        V
+                    </button>
+                    <small>Vidrio</small>
+                </div>
+
+                <div>
+                    <button class="contenedor organico"
+                            onclick="clasificar('organico')">
+                        O
+                    </button>
+                    <small>Orgánico</small>
+                </div>
+
+            </div>
+
+            <div class="progreso">
+
+                <span>
+                    Residuos:
+                    <b id="contador">0 / 10</b>
+                </span>
+
+                <div class="barra">
+                    <div id="barraProgreso"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESULTADO -->
+    <div id="resultado" class="pantalla">
+
+        <div class="tarjeta resultado">
+
+            <div class="resultado-icono" id="iconoResultado">
+                +
+            </div>
+
+            <h2 id="tituloResultado">
+                ¡Nivel completado!
+            </h2>
+
+            <p id="textoResultado">
+                La ciudad está más limpia gracias a ti.
+            </p>
+
+            <div class="puntuacion-final">
+                <span>PUNTOS</span>
+                <strong id="puntosFinal">0</strong>
+            </div>
+
+            <button class="boton principal"
+                    id="botonResultado"
+                    onclick="siguienteNivel()">
+                SIGUIENTE NIVEL
+            </button>
+
+            <button class="boton secundario"
+                    onclick="volverMenu()">
+                MENU PRINCIPAL
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
