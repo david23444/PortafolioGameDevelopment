@@ -1,89 +1,196 @@
+<div align="center">
+
 # 🎮 Colección de Juegos Web Educativos
 
-Repositorio con una serie de **mini-juegos web** desarrollados en **HTML5, CSS3 y JavaScript vainilla** (sin frameworks ni build tools), enfocados en concientización y educación: agua, alimentación saludable, reciclaje y narrativa social. Cada proyecto es autocontenido y corre directamente en el navegador.
+### Jugá. Aprendé. Repetí. 🌍🧠
 
-## 📚 Proyectos incluidos
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![No Frameworks](https://img.shields.io/badge/frameworks-ninguno-blueviolet)](#)
+[![Made with ❤️](https://img.shields.io/badge/hecho%20con-%E2%9D%A4-red)](#)
 
-| Proyecto | Género | Descripción breve |
-|---|---|---|
-| 💧 [¡Salva el Agua! — Edición Arcade](#-salva-el-agua--edición-arcade) | Plataformas / Arcade | Repará ventanas con fugas de agua en un edificio de varios pisos antes de que se acabe el tiempo. |
-| 🕯️ [Ecos del Silencio](#️-ecos-del-silencio) | Novela visual | Historia interactiva sobre el duelo y el bullying, con decisiones que determinan el final. |
-| 🍹 [Fresh Flow Arcade](#-fresh-flow-arcade) | Gestión / Time management | Administrá un bar de jugos: atendé clientes, combiná ingredientes y hacé crecer el negocio. |
-| 🥦 [NutriDash: Misión Saludable](#-nutridash-misión-saludable) | Runner de carriles | Viajá de la Tierra a la Luna atrapando alimentos saludables y evitando comida chatarra. |
-| ♻️ [EcoRush](#️-ecorush) | Clasificación / Contrarreloj | Clasificá residuos en las categorías correctas de reciclaje antes de que se acabe el tiempo. |
+Colección de **mini-juegos web educativos** construidos con **HTML5, CSS3 y JavaScript vainilla puro** — cero frameworks, cero build tools. Cada juego enseña algo distinto: ahorro de agua, convivencia y bullying, reciclaje y alimentación saludable. Todo corre directo en el navegador.
 
-Todos comparten el mismo espíritu: **jugar para aprender**, con mecánicas simples, feedback inmediato (sonido, partículas, combos) y progresión por niveles.
+</div>
+
+> ⚠️ **Antes de publicar:** reemplazá `TU-REPO` por el nombre real de tu repositorio en todos los links "▶️ Jugar" — ver la sección [Cómo jugar online](#-cómo-jugar-online).
 
 ---
 
-## 💧 ¡Salva el Agua! — Edición Arcade
+## 📚 Proyectos incluidos
 
-Juego de plataformas estilo *Donkey Kong* donde el jugador recorre un edificio subiendo escaleras y saltando entre pisos para reparar ventanas y canillas que desperdician agua, antes de que se acabe el tiempo de cada "mundo".
+<table>
+  <tr>
+    <th>Vista previa</th>
+    <th>Proyecto</th>
+    <th>Género / Temática</th>
+    <th>Enlaces</th>
+  </tr>
+  <tr>
+    <td>
+      <img src="./Capturas/AhorraloRubenInicio.png" width="180"/><br/>
+      <img src="./Capturas/AhorraloRuben.png" width="180"/>
+    </td>
+    <td><b>💧 ¡Ahorra el Agua!</b><br/><sub>Edición Arcade</sub></td>
+    <td>Plataformas / Arcade<br/><sub>Ahorro de agua</sub></td>
+    <td>
+      <a href="https://david23444.github.io/TU-REPO/AhorraloRuben/">▶️ Jugar</a><br/>
+      <a href="./AhorraloRuben">📂 Código</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="./Capturas/BullyRedentionInicio.png" width="180"/><br/>
+      <img src="./Capturas/BullyRedention.png" width="180"/>
+    </td>
+    <td><b>🕯️ Ecos del Silencio</b></td>
+    <td>Novela visual<br/><sub>Bullying y duelo</sub></td>
+    <td>
+      <a href="https://david23444.github.io/TU-REPO/BullyRedention/">▶️ Jugar</a><br/>
+      <a href="./BullyRedention">📂 Código</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="./Capturas/FreshLowInicio.png" width="180"/><br/>
+      <img src="./Capturas/FreshLow.png" width="180"/>
+    </td>
+    <td><b>🍹 Fresh Flow Arcade</b></td>
+    <td>Gestión / Time management<br/><sub>Negocio responsable</sub></td>
+    <td>
+      <a href="https://david23444.github.io/TU-REPO/FreshLow/">▶️ Jugar</a><br/>
+      <a href="./FreshLow">📂 Código</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="./Capturas/Nutrihero.png" width="180"/>
+    </td>
+    <td><b>🥦 NutriDash</b><br/><sub>Misión Saludable</sub></td>
+    <td>Runner de carriles<br/><sub>Alimentación saludable</sub></td>
+    <td>
+      <a href="https://david23444.github.io/TU-REPO/NutriDash/">▶️ Jugar</a><br/>
+      <a href="./NutriDash">📂 Código</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="./Capturas/EcoRushInicio.png" width="180"/><br/>
+      <img src="./Capturas/EcoRush.png" width="180"/>
+    </td>
+    <td><b>♻️ EcoRush</b></td>
+    <td>Clasificación / Contrarreloj<br/><sub>Reciclaje</sub></td>
+    <td>
+      <a href="https://david23444.github.io/TU-REPO/EcoRush/">▶️ Jugar</a><br/>
+      <a href="./EcoRush">📂 Código</a>
+    </td>
+  </tr>
+</table>
 
-- **Mecánicas clave:** cuota de reparaciones por nivel, combos por reparaciones encadenadas, potenciadores (tiempo extra, velocidad, congelar tiempo, reparación total), tabla de puntajes con ingreso de iniciales estilo arcade.
-- **Progresión:** dificultad creciente (menos tiempo, más frecuencia de fugas) y fondos temáticos que rotan cada 4 niveles.
-- **Tecnología:** HTML5 Canvas + JS vainilla, efecto visual CRT retro.
+---
 
-## 🕯️ Ecos del Silencio
+## 🕹️ Detalle de cada juego
 
-Novela visual interactiva sobre un adolescente que, tras la muerte de su padre por acoso laboral, debe decidir si repite o rompe el ciclo de silencio y complicidad frente al bullying en su entorno escolar.
+<details open>
+<summary><b>💧 ¡Ahorra el Agua! — Edición Arcade</b></summary>
+<br/>
 
-- **Mecánicas clave:** 9 decisiones binarias, sistema de "Conciencia" (karma) que determina uno de dos finales, opciones mostradas en orden aleatorio.
-- **Detalle técnico distintivo:** las imágenes de fondo de cada escena se generan dinámicamente (LoremFlickr con *fallback* a Picsum Photos) usando un seed único por partida.
-- **Tecnología:** HTML/CSS con estética *glassmorphism* y JS vainilla, sin dependencia de imágenes fijas.
+Plataformas estilo *Donkey Kong*: subís escaleras y saltás entre pisos para reparar ventanas y canillas que desperdician agua antes de que se acabe el tiempo.
 
-## 🍹 Fresh Flow Arcade
+- Cuota de reparaciones por nivel y combos por reparaciones encadenadas.
+- Potenciadores: tiempo extra, velocidad, congelar tiempo, reparación total.
+- Tabla de puntajes con ingreso de iniciales estilo arcade.
+- Dificultad creciente y fondos temáticos que rotan cada 4 niveles.
+</details>
 
-Juego de gestión de un bar de jugos y bebidas sin alcohol. Hay que combinar ingredientes en una licuadora para cumplir los pedidos de clientes con paciencia limitada, ganar dinero, pagar el alquiler y reinvertir en mejoras.
+<details>
+<summary><b>🕯️ Ecos del Silencio</b></summary>
+<br/>
 
-- **Mecánicas clave:** recetas con ingredientes desbloqueables, barra de paciencia por cliente, combos con bonificación de dinero, tienda de mejoras (decoración y upgrades), eventos aleatorios nocturnos y condición de bancarrota.
-- **Tecnología:** HTML/CSS con estética arcade retro (fuentes *Press Start 2P*/*VT323*, scanlines CRT), sonido generado en tiempo real con **Web Audio API**.
+Novela visual sobre un adolescente que, tras la muerte de su padre por acoso laboral, decide si repite o rompe el ciclo de silencio frente al bullying en su entorno.
 
-## 🥦 NutriDash: Misión Saludable
+- 9 decisiones binarias y sistema de "Conciencia" (karma) que define el final.
+- Imágenes de fondo generadas dinámicamente por escena, con *fallback* automático.
+- Interfaz con estética *glassmorphism*.
+</details>
 
-Runner de 3 carriles en el que el jugador atrapa alimentos saludables y esquiva comida chatarra en un viaje de la Tierra a la Luna, dividido en 3 niveles con dificultad creciente.
+<details>
+<summary><b>🍹 Fresh Flow Arcade</b></summary>
+<br/>
 
-- **Mecánicas clave:** combos y multiplicador de puntos, sistema de vidas y energía, preguntas nutricionales de bonus cada 7 aciertos, power-up de estrella energética.
-- **Persistencia:** ranking top 10 guardado en `localStorage`, disponible entre sesiones.
-- **Tecnología:** HTML5 Canvas responsive (controles táctiles incluidos), CSS3 y JS vainilla, sonido vía Web Audio API.
+Gestión de un bar de jugos: combiná ingredientes en una licuadora para cumplir pedidos de clientes con paciencia limitada, y hacé crecer tu negocio.
 
-## ♻️ EcoRush
+- Recetas con ingredientes desbloqueables y tienda de mejoras.
+- Combos con bono de dinero, eventos aleatorios nocturnos y bancarrota como condición de derrota.
+- Sonido generado en tiempo real con Web Audio API.
+</details>
 
-Juego contrarreloj de clasificación de residuos: el jugador debe asignar cada objeto a su categoría correcta de reciclaje (papel, plástico, vidrio u orgánico) antes de que se acabe el tiempo.
+<details>
+<summary><b>🥦 NutriDash: Misión Saludable</b></summary>
+<br/>
 
-- **Mecánicas clave:** 3 niveles de dificultad creciente (más residuos, menos tiempo), sistema de vidas y puntuación (+100 por acierto, -1 vida/-50 puntos por error o vencimiento del tiempo).
-- **Tecnología:** HTML5 + CSS3 (variables, gradientes, animaciones, tipografía *Baloo 2*) + JS vainilla, diseño responsive para escritorio y móvil.
+Runner de 3 carriles: atrapá alimentos saludables y esquivá comida chatarra en un viaje de la Tierra a la Luna, dividido en 3 niveles.
+
+- Combos, sistema de vidas/energía y preguntas nutricionales de bonus.
+- Ranking top 10 persistente en `localStorage`.
+- Canvas responsive con controles táctiles.
+</details>
+
+<details>
+<summary><b>♻️ EcoRush</b></summary>
+<br/>
+
+Juego contrarreloj de clasificación de residuos en 4 categorías: papel, plástico, vidrio y orgánico.
+
+- 3 niveles de dificultad creciente (más residuos, menos tiempo).
+- Sistema de vidas y puntuación (+100 acierto / -1 vida y -50 puntos error).
+- Diseño responsive para escritorio y móvil.
+</details>
 
 ---
 
 ## 🛠️ Stack común
 
-Todos los proyectos de esta colección comparten el mismo enfoque técnico:
+| Tecnología | Uso |
+|---|---|
+| **HTML5** | Estructura semántica de cada pantalla (menú, tutorial, juego, pausa, resultados) |
+| **CSS3** | Estilos, variables, gradientes, animaciones y diseño responsive — sin librerías de UI |
+| **JavaScript (vainilla, ES6+)** | Lógica de juego, DOM, canvas, temporizadores — sin frameworks ni build tools |
+| **Web Audio API** | Efectos de sonido generados en tiempo real, sin archivos de audio externos |
+| **`localStorage`** | Rankings y puntajes persistentes entre sesiones, cuando aplica |
 
-- **HTML5** semántico para la estructura de pantallas (menú, tutorial, juego, pausa, resultados).
-- **CSS3** puro para estilos, animaciones y diseño responsive — sin librerías de UI.
-- **JavaScript vainilla (ES6+)**, sin frameworks ni herramientas de build.
-- Efectos de sonido generados en tiempo real con **Web Audio API** cuando aplica (sin archivos de audio externos).
-- Persistencia liviana con **`localStorage`** para rankings, cuando corresponde.
+## 🌐 Cómo jugar online
 
-No requieren instalación, `npm install` ni servidor: cada juego es uno o varios archivos estáticos (`.html` / `.css` / `.js`) que se abren directamente en el navegador.
+Para que los botones **▶️ Jugar** funcionen de verdad (y no solo muestren el código), activá **GitHub Pages**:
 
-## ▶️ Cómo ejecutar cualquiera de los juegos
+1. En el repo: **Settings → Pages**.
+2. En *Branch*, elegí `main` y carpeta `/root` → **Save**.
+3. GitHub te da una URL tipo `https://david23444.github.io/TU-REPO/`.
+4. Reemplazá `TU-REPO` por ese nombre en todos los links de este README.
+
+Cada juego queda accesible en `https://david23444.github.io/TU-REPO/NOMBRE-CARPETA/`.
+
+## ▶️ Cómo ejecutar en local
 
 ```bash
-open index.html        # macOS
-xdg-open index.html    # Linux
-start index.html       # Windows
+open AhorraloRuben/index.html        # macOS
+xdg-open AhorraloRuben/index.html    # Linux
+start AhorraloRuben/index.html       # Windows
 ```
 
-> 💡 Si un proyecto separa `index.html`, `style.css` y `script.js` en archivos distintos, mantenelos en la misma carpeta. Si el navegador bloquea la carga por políticas de archivos locales, serví la carpeta con un servidor simple (`npx serve`, `python -m http.server`, etc.).
+## 📌 Próximos pasos
 
-## 📌 Próximos pasos generales
-
-- [ ] Unificar todos los proyectos bajo una página índice (portfolio) con acceso directo a cada juego.
+- [ ] Activar GitHub Pages y reemplazar `TU-REPO` en todos los links.
+- [ ] Unificar los juegos bajo una página índice (portfolio) navegable.
 - [ ] Agregar rankings compartidos (backend) en los juegos que hoy usan `localStorage`.
-- [ ] Sumar soporte de audio ambiental/música de fondo en los que aún no lo tienen.
-- [ ] Traducir la colección a otros idiomas.
+- [ ] Sumar capturas de "Inicio" faltantes para NutriDash.
 
 ---
+
+<div align="center">
+
 *Colección de proyectos lúdico-educativos sobre sostenibilidad, salud y convivencia, pensados para concientizar mientras se juega.*
+
+</div>
